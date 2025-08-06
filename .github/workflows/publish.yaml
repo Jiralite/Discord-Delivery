@@ -1,0 +1,30 @@
+name: Publish
+on:
+  release:
+    types: [prereleased, released]
+permissions:
+  id-token: write
+jobs:
+  npm:
+    name: npm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.14.0
+          run_install: |
+            - args: [--frozen-lockfile]
+
+      - name: Publish package
+        run: pnpm publish --access public --provenance --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
