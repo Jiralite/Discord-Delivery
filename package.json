@@ -19,7 +19,7 @@
 		"distribution"
 	],
 	"scripts": {
-		"build": "tsdown",
+		"build": "tsup",
 		"format": "biome check --write",
 		"lint": "biome check",
 		"prepack": "pnpm run build && pnpm run lint",
@@ -32,7 +32,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.1.3",
-		"tsdown": "^0.13.3",
+		"tsup": "^8.5.0",
 		"typescript": "^5.9.2"
 	},
 	"devEngines": {
