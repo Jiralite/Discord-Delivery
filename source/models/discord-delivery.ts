@@ -56,6 +56,11 @@ export class DiscordDelivery {
 	private readonly force: boolean;
 
 	/**
+	 * The user id of the application.
+	 */
+	private userId?: Snowflake;
+
+	/**
 	 * Creates the Discord Delivery instance.
 	 *
 	 * @param options Options for Discord Delivery.
@@ -139,6 +144,9 @@ export class DiscordDelivery {
 	 * Starts the Discord Delivery process.
 	 */
 	public async start(): Promise<typeof this.data> {
+		// Ensure the user id is set.
+		this.userId ??= (await this.api.users.getCurrent()).id;
+
 		const result = JSON.parse(JSON.stringify(this.data)) as typeof this.data;
 
 		iteration: for (const informationChannel of this.informationChannels) {
@@ -175,6 +183,14 @@ export class DiscordDelivery {
 
 			// Iterate over the messages and check for any differences.
 			for (const [index, message] of messages.reverse().entries()) {
+				// Does the author differ?
+				if (message.author.id !== this.userId) {
+					console.info("Detected a difference in the author. Regenerating...");
+					const newMessageIds = await this.regenerate(informationChannel, messages);
+					result[informationChannel.id] = newMessageIds;
+					continue iteration;
+				}
+
 				const localMessage = informationChannel.messages[index];
 
 				if (message.content === "" && !localMessage?.content) {
