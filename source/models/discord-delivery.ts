@@ -5,7 +5,7 @@ import {
 	type Snowflake,
 } from "@discordjs/core";
 import { REST } from "@discordjs/rest";
-import { isBulkDeletable } from "../utility/functions.js";
+import { isBulkDeletable, isComponentsDifferent } from "../utility/functions.js";
 import type { InformationChannel } from "./information-channel.js";
 
 /**
@@ -193,6 +193,16 @@ export class DiscordDelivery {
 
 				const localMessage = informationChannel.messages[index];
 
+				if (isComponentsDifferent(message.components ?? [], localMessage?.components ?? [])) {
+					console.info(
+						`Detected a difference in message components for ${message.id}. Regenerating...`,
+					);
+
+					const newMessageIds = await this.regenerate(informationChannel, messages);
+					result[informationChannel.id] = newMessageIds;
+					continue iteration;
+				}
+
 				if (message.content === "" && !localMessage?.content) {
 					// There is no content to compare. Continue for now.
 					continue;
@@ -202,6 +212,7 @@ export class DiscordDelivery {
 					console.info(
 						`Detected a difference in message content for ${message.id}. Regenerating...`,
 					);
+
 					console.info(`Old: ${message.content}`);
 					console.info(`New: ${localMessage?.content}`);
 					const newMessageIds = await this.regenerate(informationChannel, messages);
