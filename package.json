@@ -1,6 +1,6 @@
 {
 	"name": "discord-delivery",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Helpful tool for read-only channels in Discord servers.",
 	"keywords": [
 		"Discord Delivery",
